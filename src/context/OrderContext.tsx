@@ -1,21 +1,35 @@
 import { createContext, useEffect, useState } from "react";
 
 type OrderContextProps = {
-  appettizer: [];
-  hamburger: [];
-  combo: [];
-  dessert: [];
-  beverage: [];
-  totalValue: number;
+  appettizerOrder: any[];
+  hamburgerOrder: any[];
+  beveregeOrder: any[];
+  order: {
+    appettizer: any[];
+    hamburger: any[];
+    combo: any[];
+    dessert: any[];
+    beverage: any[];
+    totalValue: number;
+  };
+  setAppettizerOrder: React.Dispatch<React.SetStateAction<any[]>>;
+  setHamburgerOrder: React.Dispatch<React.SetStateAction<any[]>>;
+  setBeveregeOrder: React.Dispatch<React.SetStateAction<any[]>>;
+  setOrder: React.Dispatch<
+    React.SetStateAction<{
+      appettizer: any[];
+      hamburger: any[];
+      combo: any[];
+      dessert: any[];
+      beverage: any[];
+      totalValue: number;
+    }>
+  >;
 };
 
-const OrderContext = createContext<OrderContextProps>({});
+const OrderContext = createContext<OrderContextProps>({} as OrderContextProps);
 
-interface OrderContextProviderProps {
-  children: React.ReactNode;
-}
-
-const OrderContextProvider = ({ children }: OrderContextProviderProps) => {
+const OrderContextProvider: React.FC = ({ children }) => {
   const inicialOrder = {
     appettizer: [],
     hamburger: [],
@@ -25,22 +39,10 @@ const OrderContextProvider = ({ children }: OrderContextProviderProps) => {
     totalValue: 0,
   };
 
-  const [appettizerOrder, setAppettizerOrder] = useState([]);
-  const [hamburgerOrder, setHamburgerOrder] = useState([]);
-  const [beveregeOrder, setBeveregeOrder] = useState([]);
+  const [appettizerOrder, setAppettizerOrder] = useState<any[]>([]);
+  const [hamburgerOrder, setHamburgerOrder] = useState<any[]>([]);
+  const [beveregeOrder, setBeveregeOrder] = useState<any[]>([]);
   const [order, setOrder] = useState(inicialOrder);
-
-  const sumValues = (arrayValues) => {
-    return arrayValues.reduce(
-      (acumulador, valorAtual) => acumulador + Number(valorAtual),
-      0
-    );
-  };
-
-  const getPrices = (values) => {
-    const result = values.map((item) => item.value);
-    return result;
-  };
 
   useEffect(() => {
     const subTotalHamburgers = getPrices(hamburgerOrder);
@@ -53,9 +55,9 @@ const OrderContextProvider = ({ children }: OrderContextProviderProps) => {
 
     const internalOrder = {
       ...order,
-      ["hamburger"]: hamburgerOrder,
-      ["appettizer"]: appettizerOrder,
-      ["beverege"]: beveregeOrder,
+      hamburger: hamburgerOrder,
+      appettizer: appettizerOrder,
+      beverege: beveregeOrder,
       totalValue: sumValues(subtotal),
     };
 
@@ -63,7 +65,19 @@ const OrderContextProvider = ({ children }: OrderContextProviderProps) => {
     console.log(internalOrder);
 
     setOrder(internalOrder);
-  }, [hamburgerOrder, appettizerOrder, setOrder]);
+  }, [hamburgerOrder, appettizerOrder, beveregeOrder, setOrder]);
+
+  const sumValues = (arrayValues: number[]) => {
+    return arrayValues.reduce(
+      (acumulador, valorAtual) => acumulador + Number(valorAtual),
+      0
+    );
+  };
+
+  const getPrices = (values: any[]) => {
+    const result = values.map((item) => item.value);
+    return result;
+  };
 
   return (
     <OrderContext.Provider
